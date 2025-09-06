@@ -2,8 +2,22 @@
 import RoomItem from "@/components/RoomItem.vue"
 import BookingForm from "@/components/BookingForm.vue"
 import BookingConfirmation from "@/components/BookingConfirmation.vue"
+import SimpleDialog from "@/components/SimpleDialog.vue"
 import { ref, computed, onMounted } from "vue"
 import { searchRooms } from "@/services/api"
+import { useDialog } from "@/composables/useDialog"
+
+const {
+  isVisible: dialogVisible,
+  title: dialogTitle,
+  message: dialogMessage,
+  showCancel: dialogShowCancel,
+  confirmText: dialogConfirmText,
+  cancelText: dialogCancelText,
+  showAlert,
+  handleConfirm: handleDialogConfirm,
+  handleCancel: handleDialogCancel
+} = useDialog()
 
 const rooms = ref([])
 const loading = ref(false)
@@ -25,7 +39,7 @@ checkOutDate.value = tomorrow.toISOString().split('T')[0]
 const search = ref("")
 const minPrice = ref(0)
 const maxPrice = ref(500)
-const capacity = ref("")
+const capacity = ref(0)
 
 // Load rooms from API
 const loadRooms = async () => {
@@ -48,12 +62,11 @@ const loadRooms = async () => {
         rooms.value = response.map(room => ({
             id: room.id,
             number: room.number,
-            name: `${room.room_type} (${room.number})`,
+            name: `${room.room_type || 'Room'} (${room.number})`,
             price: room.price_dollar,
             capacity: room.capacity,
             available: true,
-            description: room.description,
-            amenities: room.amenities || []
+            description: room.description
         }))
     } catch (err) {
         console.error('Error loading rooms:', err)
@@ -74,7 +87,7 @@ const filteredRooms = computed(() =>
             room.name.toLowerCase().includes(search.value.toLowerCase()) &&
             room.price >= minPrice.value &&
             room.price <= maxPrice.value &&
-            (capacity.value ? room.capacity >= capacity.value : true)
+            (capacity.value <= 0 || room.capacity >= capacity.value)
         )
     })
 )
@@ -111,7 +124,7 @@ function onCheckInDateChange() {
 
 function confirmDates() {
     if (!isValidDateRange.value) {
-        alert('Please select valid check-in and check-out dates.')
+        showAlert('Please select valid check-in and check-out dates.')
         return
     }
 
@@ -120,7 +133,7 @@ function confirmDates() {
 
 function bookRoom(room) {
     if (!isValidDateRange.value) {
-        alert('Please select valid dates before booking.')
+        showAlert('Please select valid dates before booking.')
         return
     }
 
@@ -230,13 +243,8 @@ const closeBookingConfirmation = () => {
                         <!-- Capacity -->
                         <div class="mb-6">
                             <label class="block mb-2 text-sm font-medium text-gray-700">Guest Capacity</label>
-                            <select v-model="capacity"
-                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors appearance-none bg-white">
-                                <option value="">Any capacity</option>
-                                <option value="2">2 guests</option>
-                                <option value="4">4 guests</option>
-                                <option value="6">6 guests</option>
-                            </select>
+                            <input v-model.number="capacity" type="number" min="1" max="10" placeholder="Number of guests"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" />
                         </div>
 
                         <!-- Price Range -->
@@ -314,6 +322,18 @@ const closeBookingConfirmation = () => {
             :check-in="checkInDate"
             :check-out="checkOutDate"
             @close="closeBookingConfirmation"
+        />
+
+        <!-- Simple Dialog -->
+        <SimpleDialog
+            v-model="dialogVisible"
+            :title="dialogTitle"
+            :message="dialogMessage"
+            :show-cancel="dialogShowCancel"
+            :confirm-text="dialogConfirmText"
+            :cancel-text="dialogCancelText"
+            @confirm="handleDialogConfirm"
+            @cancel="handleDialogCancel"
         />
     </div>
 </template>

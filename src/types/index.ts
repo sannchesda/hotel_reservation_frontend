@@ -33,6 +33,7 @@ export interface Booking {
   check_out: string;
   total_dollar: number;
   status: BookingStatus;
+  payment_status?: string;
   created_at?: string;
   updated_at?: string;
 }

@@ -33,6 +33,12 @@
 
         <!-- Guest Information Form -->
         <form @submit.prevent="submitBooking" class="space-y-4">
+          <div v-if="authStore.isLoggedIn" class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p class="text-blue-800 text-sm">
+              <span class="font-medium">Booking as:</span> {{ authStore.user?.name }} ({{ authStore.user?.email }})
+            </p>
+          </div>
+          
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
@@ -40,7 +46,11 @@
                 v-model="guestInfo.full_name"
                 type="text"
                 required
-                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                :readonly="authStore.isLoggedIn"
+                :class="[
+                  'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                  authStore.isLoggedIn ? 'bg-gray-50' : ''
+                ]"
                 placeholder="Enter your full name"
               />
             </div>
@@ -50,7 +60,11 @@
                 v-model="guestInfo.email"
                 type="email"
                 required
-                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                :readonly="authStore.isLoggedIn"
+                :class="[
+                  'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                  authStore.isLoggedIn ? 'bg-gray-50' : ''
+                ]"
                 placeholder="Enter your email"
               />
             </div>
@@ -95,8 +109,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { createBooking } from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
 
 interface Room {
   id: number
@@ -117,6 +132,7 @@ const emit = defineEmits<{
   booked: [bookingId: number]
 }>()
 
+const authStore = useAuthStore()
 const loading = ref(false)
 const error = ref('')
 
@@ -124,6 +140,14 @@ const guestInfo = ref({
   full_name: '',
   email: '',
   phone: ''
+})
+
+// Auto-fill user info if logged in
+onMounted(() => {
+  if (authStore.isLoggedIn && authStore.user) {
+    guestInfo.value.email = authStore.user.email
+    guestInfo.value.full_name = authStore.user.name
+  }
 })
 
 const checkInFormatted = computed(() => new Date(props.checkIn).toLocaleDateString())

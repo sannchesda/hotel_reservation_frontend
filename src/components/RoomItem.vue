@@ -1,9 +1,4 @@
 <script setup lang="ts">
-interface Amenity {
-    id: number;
-    name: string;
-}
-
 interface Room {
     id: number | string;
     name: string;
@@ -11,7 +6,6 @@ interface Room {
     price: number;
     available: boolean;
     description?: string;
-    amenities?: Amenity[];
 }
 
 interface Props {
@@ -54,20 +48,6 @@ const bookRoom = (room: Room) => {
                     </path>
                 </svg>
                 Up to {{ props.room.capacity }} guests
-            </div>
-
-            <!-- Amenities -->
-            <div v-if="props.room.amenities && props.room.amenities.length > 0" class="mb-4">
-                <div class="flex flex-wrap gap-1">
-                    <span v-for="amenity in props.room.amenities.slice(0, 3)" :key="amenity.id"
-                        class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                        {{ amenity.name }}
-                    </span>
-                    <span v-if="props.room.amenities.length > 3"
-                        class="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">
-                        +{{ props.room.amenities.length - 3 }} more
-                    </span>
-                </div>
             </div>
 
             <div class="mt-auto">

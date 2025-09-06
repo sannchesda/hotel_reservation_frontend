@@ -6,19 +6,17 @@ export async function searchRooms(params: {
   check_in: string;
   check_out: string;
   max_price?: number;
-  amenities?: string[];
 }) {
-  const p = { ...params, amenities: params.amenities?.join(",") };
-  return (await api.get("/rooms", { params: p })).data;
+  return (await api.get("/rooms/", { params })).data;
 }
 export async function createBooking(payload: any) {
   return (await api.post("/bookings/", payload)).data;
 }
 export async function getBooking(id: number) {
-  return (await api.get(`/bookings/${id}`)).data;
+  return (await api.get(`/bookings/${id}/`)).data;
 }
 export async function cancelBooking(id: number) {
-  return (await api.patch(`/bookings/${id}`, { status: "CANCELLED" })).data;
+  return (await api.patch(`/bookings/${id}/`, { status: "CANCELLED" })).data;
 }
 export async function confirmPayment(booking_id: number, provider_ref: string) {
   return (
@@ -35,13 +33,8 @@ export async function createRoom(payload: {
   room_type: string;
   capacity: number;
   price_dollar: number;
-  amenities?: number[];
 }) {
   return (await api.post("/rooms/", payload)).data;
-}
-
-export async function getAmenities() {
-  return (await api.get("/amenities/")).data;
 }
 
 // Room CRUD operations
@@ -50,7 +43,7 @@ export async function getRooms() {
 }
 
 export async function getRoom(id: number) {
-  return (await api.get(`/rooms/${id}`)).data;
+  return (await api.get(`/rooms/${id}/`)).data;
 }
 
 export async function updateRoom(id: number, payload: {
@@ -58,13 +51,12 @@ export async function updateRoom(id: number, payload: {
   room_type?: string;
   capacity?: number;
   price_dollar?: number;
-  amenities?: number[];
 }) {
-  return (await api.put(`/rooms/${id}`, payload)).data;
+  return (await api.put(`/rooms/${id}/`, payload)).data;
 }
 
 export async function deleteRoom(id: number) {
-  return (await api.delete(`/rooms/${id}`)).data;
+  return (await api.delete(`/rooms/${id}/`)).data;
 }
 
 // Booking CRUD operations
@@ -78,9 +70,22 @@ export async function updateBooking(id: number, payload: {
   check_out?: string;
   room_id?: number;
 }) {
-  return (await api.put(`/bookings/${id}`, payload)).data;
+  return (await api.put(`/bookings/${id}/`, payload)).data;
+}
+
+export async function getBookingsByEmail(email: string) {
+  return (await api.get("/bookings/by_email/", { params: { email } })).data;
+}
+
+export async function getMyBookings() {
+  // Get current user's bookings (requires authentication)
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  if (!user.email) {
+    throw new Error('User not authenticated');
+  }
+  return (await api.get("/bookings/my_bookings/", { params: { user_email: user.email } })).data;
 }
 
 export async function deleteBooking(id: number) {
-  return (await api.delete(`/bookings/${id}`)).data;
+  return (await api.delete(`/bookings/${id}/`)).data;
 }

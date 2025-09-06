@@ -85,7 +85,7 @@
                     <div class="text-sm text-gray-500">{{ booking.guest.email }}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ booking.room.room_type }} ({{ booking.room.number }})
+                    {{ booking.room.room_type || 'Room' }} ({{ booking.room.number }})
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {{ formatDate(booking.check_in) }} - {{ formatDate(booking.check_out) }}
@@ -105,12 +105,6 @@
                         class="text-blue-600 hover:text-blue-900"
                       >
                         Edit
-                      </button>
-                      <button
-                        @click="confirmDeleteBooking(booking)"
-                        class="text-red-600 hover:text-red-900"
-                      >
-                        Delete
                       </button>
                     </div>
                   </td>
@@ -145,7 +139,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
             <div v-for="room in rooms" :key="room.id" 
                  class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-              <h3 class="font-semibold text-lg mb-2">{{ room.room_type }}</h3>
+              <h3 class="font-semibold text-lg mb-2">{{ room.room_type || 'Room' }}</h3>
               <p class="text-gray-600 mb-2">Room {{ room.number }}</p>
               <p class="text-gray-600 mb-2">Capacity: {{ room.capacity }} guests</p>
               <p class="text-green-600 font-semibold mb-3">${{ room.price_dollar }}/night</p>
@@ -329,7 +323,7 @@ const editRoom = (room: Room) => {
 
 const confirmDeleteRoom = (room: Room) => {
   deleteTarget.value = { type: 'room', item: room }
-  deleteConfirmMessage.value = `Are you sure you want to delete room ${room.room_type} (${room.number})? This action cannot be undone.`
+  deleteConfirmMessage.value = `Are you sure you want to delete room ${room.room_type || 'Room'} (${room.number})? This action cannot be undone.`
   showDeleteModal.value = true
 }
 

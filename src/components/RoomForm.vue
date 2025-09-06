@@ -24,11 +24,11 @@
             <!-- Room Type -->
             <div>
                 <label for="room_type" class="block text-sm font-medium text-gray-700 mb-1">
-                    Room Type
+                    Room Type (Optional)
                 </label>
-                <select id="room_type" v-model="form.room_type" required
+                <select id="room_type" v-model="form.room_type"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">Select room type</option>
+                    <option value="">Select room type (optional)</option>
                     <option value="Standard">Standard</option>
                     <option value="Deluxe">Deluxe</option>
                     <option value="Suite">Suite</option>
@@ -58,25 +58,6 @@
                 <p v-if="errors.price_dollar" class="mt-1 text-sm text-red-600">{{ errors.price_dollar }}</p>
             </div>
 
-            <!-- Amenities -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Amenities
-                </label>
-                <div v-if="loadingAmenities" class="text-sm text-gray-500">Loading amenities...</div>
-                <div v-else-if="amenities.length > 0"
-                    class="max-h-32 overflow-y-auto border border-gray-200 rounded-md p-2">
-                    <div v-for="amenity in amenities" :key="amenity.id" class="flex items-center mb-2">
-                        <input :id="`amenity-${amenity.id}`" v-model="form.amenities" :value="amenity.id"
-                            type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-                        <label :for="`amenity-${amenity.id}`" class="ml-2 text-sm text-gray-700">
-                            {{ amenity.name }}
-                        </label>
-                    </div>
-                </div>
-                <div v-else class="text-sm text-gray-500">No amenities available</div>
-            </div>
-
             <!-- Submit Button -->
             <div class="flex justify-end space-x-3 pt-4">
                 <button type="button" @click="$emit('close')"
@@ -95,13 +76,8 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
-import { createRoom, getAmenities, updateRoom } from '@/services/api'
+import { createRoom, updateRoom } from '@/services/api'
 import type { Room } from '@/types'
-
-interface Amenity {
-    id: number
-    name: string
-}
 
 interface Props {
     room?: Room
@@ -122,27 +98,12 @@ const form = reactive({
     number: '',
     room_type: '',
     capacity: 1,
-    price_dollar: 0,
-    amenities: [] as number[]
+    price_dollar: 0
 })
 
 // Component state
 const submitting = ref(false)
-const loadingAmenities = ref(false)
-const amenities = ref<Amenity[]>([])
 const errors = ref<Record<string, string>>({})
-
-// Load amenities on component mount
-const loadAmenities = async () => {
-    loadingAmenities.value = true
-    try {
-        amenities.value = await getAmenities()
-    } catch (error) {
-        console.error('Error loading amenities:', error)
-    } finally {
-        loadingAmenities.value = false
-    }
-}
 
 // Initialize form with existing room data
 const initializeForm = () => {
@@ -151,7 +112,6 @@ const initializeForm = () => {
         form.room_type = props.room.room_type
         form.capacity = props.room.capacity
         form.price_dollar = props.room.price_dollar
-        form.amenities = props.room.amenities ? props.room.amenities.map(a => a.id) : []
     }
 }
 
@@ -161,10 +121,6 @@ const validateForm = () => {
 
     if (!form.number.trim()) {
         errors.value.number = 'Room number is required'
-    }
-
-    if (!form.room_type) {
-        errors.value.room_type = 'Room type is required'
     }
 
     if (form.capacity < 1 || form.capacity > 10) {
@@ -191,8 +147,7 @@ const handleSubmit = async () => {
             number: form.number.trim(),
             room_type: form.room_type,
             capacity: form.capacity,
-            price_dollar: form.price_dollar,
-            amenities: form.amenities.length > 0 ? form.amenities : undefined
+            price_dollar: form.price_dollar
         }
 
         let result
@@ -228,7 +183,6 @@ const handleSubmit = async () => {
 }
 
 onMounted(() => {
-    loadAmenities()
     initializeForm()
 })
 </script>

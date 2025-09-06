@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { api } from '@/services/api'
+import { useDialog } from '@/composables/useDialog'
+import SimpleDialog from '@/components/SimpleDialog.vue'
 
 interface Room {
   id: number
@@ -19,6 +22,20 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   close: []
 }>()
+
+const router = useRouter()
+
+const {
+  isVisible: dialogVisible,
+  title: dialogTitle,
+  message: dialogMessage,
+  showCancel: dialogShowCancel,
+  confirmText: dialogConfirmText,
+  cancelText: dialogCancelText,
+  showAlert,
+  handleConfirm: handleDialogConfirm,
+  handleCancel: handleDialogCancel
+} = useDialog()
 
 const loading = ref(false)
 const paymentStatus = ref('')
@@ -61,10 +78,12 @@ const processPayment = async () => {
   }
 }
 
-const viewBooking = () => {
-  // In a real app, this would navigate to a booking details page
-  alert(`Booking #${props.bookingId} - Payment completed successfully!`)
+const viewBooking = async () => {
+  // Navigate to my bookings page
+  await showAlert(`Booking #${props.bookingId} - Payment completed successfully!`)
   emit('close')
+  // Use router to navigate to my-bookings
+  router.push('/my-bookings')
 }
 </script>
 
@@ -120,5 +139,17 @@ const viewBooking = () => {
         </div>
       </div>
     </div>
+
+    <!-- Simple Dialog -->
+    <SimpleDialog
+      v-model="dialogVisible"
+      :title="dialogTitle"
+      :message="dialogMessage"
+      :show-cancel="dialogShowCancel"
+      :confirm-text="dialogConfirmText"
+      :cancel-text="dialogCancelText"
+      @confirm="handleDialogConfirm"
+      @cancel="handleDialogCancel"
+    />
   </div>
 </template>

@@ -25,8 +25,7 @@
               v-model="form.guest.full_name"
               type="text"
               required
-              :disabled="isEditing"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
             <p v-if="errors.full_name" class="mt-1 text-sm text-red-600">{{ errors.full_name }}</p>
           </div>
@@ -40,8 +39,7 @@
               v-model="form.guest.email"
               type="email"
               required
-              :disabled="isEditing"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
             <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
           </div>
@@ -55,8 +53,7 @@
               v-model="form.guest.phone"
               type="tel"
               required
-              :disabled="isEditing"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
             <p v-if="errors.phone" class="mt-1 text-sm text-red-600">{{ errors.phone }}</p>
           </div>
@@ -79,7 +76,7 @@
             >
               <option value="">Select a room</option>
               <option v-for="room in availableRooms" :key="room.id" :value="room.id">
-                {{ room.room_type }} - Room {{ room.number }} (${{ room.price_dollar }}/night)
+                {{ room.room_type || 'Room' }} - Room {{ room.number }} (${{ room.price_dollar }}/night)
               </option>
             </select>
             <p v-if="errors.room_id" class="mt-1 text-sm text-red-600">{{ errors.room_id }}</p>
@@ -98,8 +95,6 @@
               <option value="PENDING">Pending</option>
               <option value="CONFIRMED">Confirmed</option>
               <option value="CANCELLED">Cancelled</option>
-              <option value="CHECKED_IN">Checked In</option>
-              <option value="CHECKED_OUT">Checked Out</option>
             </select>
             <p v-if="errors.status" class="mt-1 text-sm text-red-600">{{ errors.status }}</p>
           </div>
