@@ -1,13 +1,13 @@
 <script setup>
 import RoomItem from "@/components/RoomItem.vue"
-import { ref, computed } from "vue"
+import BookingForm from "@/components/BookingForm.vue"
+import BookingConfirmation from "@/components/BookingConfirmation.vue"
+import { ref, computed, onMounted } from "vue"
+import { searchRooms } from "@/services/api"
 
-const rooms = ref([
-    { id: 1, name: "Deluxe Room", price: 60, capacity: 2, available: true },
-    { id: 2, name: "Family Suite", price: 120, capacity: 4, available: false },
-    { id: 3, name: "Standard Room", price: 40, capacity: 2, available: true },
-    { id: 4, name: "Presidential Suite", price: 200, capacity: 6, available: true },
-])
+const rooms = ref([])
+const loading = ref(false)
+const error = ref("")
 
 // Date picker variables
 const checkInDate = ref("")
@@ -24,8 +24,49 @@ checkOutDate.value = tomorrow.toISOString().split('T')[0]
 // Filters
 const search = ref("")
 const minPrice = ref(0)
-const maxPrice = ref(200)
+const maxPrice = ref(500)
 const capacity = ref("")
+
+// Load rooms from API
+const loadRooms = async () => {
+    if (!isValidDateRange.value) return
+    
+    loading.value = true
+    error.value = ""
+    
+    try {
+        const params = {
+            check_in: checkInDate.value,
+            check_out: checkOutDate.value,
+        }
+        
+        if (maxPrice.value > 0) {
+            params.max_price = maxPrice.value * 100 // Convert to cents
+        }
+        
+        const response = await searchRooms(params)
+        rooms.value = response.map(room => ({
+            id: room.id,
+            number: room.number,
+            name: `${room.room_type} (${room.number})`,
+            price: room.price_dollar,
+            capacity: room.capacity,
+            available: true,
+            description: room.description,
+            amenities: room.amenities || []
+        }))
+    } catch (err) {
+        console.error('Error loading rooms:', err)
+        error.value = "Failed to load rooms. Please try again."
+    } finally {
+        loading.value = false
+    }
+}
+
+// Load rooms on component mount
+onMounted(() => {
+    loadRooms()
+})
 
 const filteredRooms = computed(() =>
     rooms.value.filter((room) => {
@@ -33,7 +74,7 @@ const filteredRooms = computed(() =>
             room.name.toLowerCase().includes(search.value.toLowerCase()) &&
             room.price >= minPrice.value &&
             room.price <= maxPrice.value &&
-            (capacity.value ? room.capacity == capacity.value : true)
+            (capacity.value ? room.capacity >= capacity.value : true)
         )
     })
 )
@@ -74,10 +115,7 @@ function confirmDates() {
         return
     }
 
-    const checkIn = new Date(checkInDate.value).toLocaleDateString()
-    const checkOut = new Date(checkOutDate.value).toLocaleDateString()
-
-    alert(`Dates confirmed!\nCheck-in: ${checkIn}\nCheck-out: ${checkOut}\nNights: ${numberOfNights.value}`)
+    loadRooms()
 }
 
 function bookRoom(room) {
@@ -86,23 +124,38 @@ function bookRoom(room) {
         return
     }
 
-    const checkIn = new Date(checkInDate.value).toLocaleDateString()
-    const checkOut = new Date(checkOutDate.value).toLocaleDateString()
-
-    alert(`Booking ${room.name}\nDates: ${checkIn} to ${checkOut}\nNights: ${numberOfNights.value}\nTotal: $${room.price * numberOfNights.value}`)
+    selectedRoom.value = room
+    showBookingForm.value = true
 }
+
+const selectedRoom = ref(null)
+const showBookingForm = ref(false)
+const showBookingConfirmation = ref(false)
+const currentBookingId = ref(null)
+
+const onBookingCompleted = (bookingId) => {
+    showBookingForm.value = false
+    currentBookingId.value = bookingId
+    showBookingConfirmation.value = true
+}
+
+const closeBookingForm = () => {
+    showBookingForm.value = false
+    selectedRoom.value = null
+}
+
+const closeBookingConfirmation = () => {
+    showBookingConfirmation.value = false
+    selectedRoom.value = null
+    currentBookingId.value = null
+    // Refresh room availability after booking
+    loadRooms()
+};
+
 </script>
 
 <template>
     <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-        <!-- Header Section -->
-        <div class="bg-white shadow-sm border-b">
-            <div class="max-w-7xl mx-auto px-6 py-8">
-                <h1 class="text-4xl font-bold text-gray-900 mb-2">Find Your Perfect Stay</h1>
-                <p class="text-gray-600 text-lg">Discover comfortable rooms tailored to your needs</p>
-            </div>
-        </div>
-
         <div class="max-w-7xl mx-auto px-6 py-8">
             <!-- Date Selection Card -->
             <div class="mb-8">
@@ -216,6 +269,20 @@ function bookRoom(room) {
                         <h2 class="text-2xl font-bold text-gray-900 mb-2">Available Rooms</h2>
                         <p class="text-gray-600">{{ filteredRooms.length }} room{{ filteredRooms.length !== 1 ? 's' : ''
                         }} found</p>
+                        
+                        <!-- Loading state -->
+                        <div v-if="loading" class="text-center py-8">
+                            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                            <p class="mt-2 text-gray-600">Loading rooms...</p>
+                        </div>
+                        
+                        <!-- Error state -->
+                        <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
+                            <p class="text-red-600">{{ error }}</p>
+                            <button @click="loadRooms" class="mt-2 text-red-600 hover:text-red-800 underline">
+                                Try again
+                            </button>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -228,5 +295,25 @@ function bookRoom(room) {
                 </main>
             </div>
         </div>
+
+        <!-- Booking Form Modal -->
+        <BookingForm 
+            v-if="showBookingForm && selectedRoom"
+            :room="selectedRoom"
+            :check-in="checkInDate"
+            :check-out="checkOutDate"
+            @close="closeBookingForm"
+            @booked="onBookingCompleted"
+        />
+        
+        <!-- Booking Confirmation Modal -->
+        <BookingConfirmation
+            v-if="showBookingConfirmation && selectedRoom && currentBookingId"
+            :booking-id="currentBookingId"
+            :room="selectedRoom"
+            :check-in="checkInDate"
+            :check-out="checkOutDate"
+            @close="closeBookingConfirmation"
+        />
     </div>
 </template>
