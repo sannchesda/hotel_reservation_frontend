@@ -33,51 +33,26 @@
 
         <!-- Guest Information Form -->
         <form @submit.prevent="submitBooking" class="space-y-4">
-          <div v-if="authStore.isLoggedIn" class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p class="text-blue-800 text-sm">
-              <span class="font-medium">Booking as:</span> {{ authStore.user?.name }} ({{ authStore.user?.email }})
-            </p>
-          </div>
-          
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-              <input
-                v-model="guestInfo.full_name"
-                type="text"
-                required
-                :readonly="authStore.isLoggedIn"
-                :class="[
-                  'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-                  authStore.isLoggedIn ? 'bg-gray-50' : ''
-                ]"
-                placeholder="Enter your full name"
-              />
+              <input v-model="guestInfo.full_name" type="text" required :class="[
+                'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              ]" placeholder="Enter your full name" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-              <input
-                v-model="guestInfo.email"
-                type="email"
-                required
-                :readonly="authStore.isLoggedIn"
-                :class="[
-                  'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-                  authStore.isLoggedIn ? 'bg-gray-50' : ''
-                ]"
-                placeholder="Enter your email"
-              />
+              <input v-model="guestInfo.email" type="email" required :class="[
+                'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+              ]" placeholder="Enter your email" />
             </div>
           </div>
-          
+
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-            <input
-              v-model="guestInfo.phone"
-              type="tel"
+            <input v-model="guestInfo.phone" type="tel"
               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your phone number"
-            />
+              placeholder="Enter your phone number" />
           </div>
 
           <!-- Error Message -->
@@ -87,18 +62,12 @@
 
           <!-- Action Buttons -->
           <div class="flex gap-4 pt-4">
-            <button
-              type="button"
-              @click="$emit('close')"
-              class="flex-1 py-3 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-            >
+            <button type="button" @click="$emit('close')"
+              class="flex-1 py-3 px-6 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
               Cancel
             </button>
-            <button
-              type="submit"
-              :disabled="loading"
-              class="flex-1 py-3 px-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 disabled:opacity-50"
-            >
+            <button type="submit" :disabled="loading"
+              class="flex-1 py-3 px-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 disabled:opacity-50">
               {{ loading ? 'Processing...' : 'Book Now' }}
             </button>
           </div>
@@ -166,7 +135,7 @@ const totalAmount = computed(() => {
 
 // Simple UUID generator
 const generateUUID = () => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     const r = Math.random() * 16 | 0
     const v = c == 'x' ? r : (r & 0x3 | 0x8)
     return v.toString(16)

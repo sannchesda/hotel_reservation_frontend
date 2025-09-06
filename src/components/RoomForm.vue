@@ -21,22 +21,6 @@
                 <p v-if="errors.number" class="mt-1 text-sm text-red-600">{{ errors.number }}</p>
             </div>
 
-            <!-- Room Type -->
-            <div>
-                <label for="room_type" class="block text-sm font-medium text-gray-700 mb-1">
-                    Room Type (Optional)
-                </label>
-                <select id="room_type" v-model="form.room_type"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">Select room type (optional)</option>
-                    <option value="Standard">Standard</option>
-                    <option value="Deluxe">Deluxe</option>
-                    <option value="Suite">Suite</option>
-                    <option value="Presidential Suite">Presidential Suite</option>
-                </select>
-                <p v-if="errors.room_type" class="mt-1 text-sm text-red-600">{{ errors.room_type }}</p>
-            </div>
-
             <!-- Capacity -->
             <div>
                 <label for="capacity" class="block text-sm font-medium text-gray-700 mb-1">
@@ -96,7 +80,6 @@ const isEditing = computed(() => !!props.room)
 // Form data
 const form = reactive({
     number: '',
-    room_type: '',
     capacity: 1,
     price_dollar: 0
 })
@@ -109,7 +92,6 @@ const errors = ref<Record<string, string>>({})
 const initializeForm = () => {
     if (props.room) {
         form.number = props.room.number
-        form.room_type = props.room.room_type
         form.capacity = props.room.capacity
         form.price_dollar = props.room.price_dollar
     }
@@ -145,7 +127,7 @@ const handleSubmit = async () => {
     try {
         const roomData = {
             number: form.number.trim(),
-            room_type: form.room_type,
+            room_type: '', // Empty string for optional room type
             capacity: form.capacity,
             price_dollar: form.price_dollar
         }
