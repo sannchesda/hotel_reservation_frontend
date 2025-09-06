@@ -68,12 +68,6 @@ const handleLogin = async () => {
 }
 
 const skipLogin = () => {
-    // For development - login as guest
-    authStore.login({
-        email: 'guest@demo.com',
-        name: 'Guest User',
-        type: 'guest'
-    })
     router.push('/')
 };
 </script>

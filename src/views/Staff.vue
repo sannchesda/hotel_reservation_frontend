@@ -10,26 +10,20 @@
       <!-- Navigation Tabs -->
       <div class="mb-8">
         <nav class="flex space-x-8">
-          <button
-            @click="activeTab = 'bookings'"
-            :class="[
-              'py-2 px-1 border-b-2 font-medium text-sm',
-              activeTab === 'bookings'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            ]"
-          >
+          <button @click="activeTab = 'bookings'" :class="[
+            'py-2 px-1 border-b-2 font-medium text-sm',
+            activeTab === 'bookings'
+              ? 'border-blue-500 text-blue-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          ]">
             Bookings
           </button>
-          <button
-            @click="activeTab = 'rooms'"
-            :class="[
-              'py-2 px-1 border-b-2 font-medium text-sm',
-              activeTab === 'rooms'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            ]"
-          >
+          <button @click="activeTab = 'rooms'" :class="[
+            'py-2 px-1 border-b-2 font-medium text-sm',
+            activeTab === 'rooms'
+              ? 'border-blue-500 text-blue-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          ]">
             Rooms
           </button>
         </nav>
@@ -40,14 +34,12 @@
         <div class="bg-white shadow rounded-lg">
           <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
             <h2 class="text-lg font-medium text-gray-900">All Bookings</h2>
-            <button
-              @click="showCreateBookingModal = true"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-            >
+            <button @click="showCreateBookingModal = true"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
               + Create Booking
             </button>
           </div>
-          
+
           <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
@@ -62,7 +54,10 @@
                     Room
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Dates
+                    Check In - Check Out
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Created At
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Total
@@ -91,19 +86,20 @@
                     {{ formatDate(booking.check_in) }} - {{ formatDate(booking.check_out) }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ formatDate(booking.created_at ?? "") }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     ${{ booking.total_dollar }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <span :class="getStatusColor(booking.status)" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
+                    <span :class="getStatusColor(booking.status)"
+                      class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
                       {{ booking.status }}
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div class="flex space-x-2">
-                      <button
-                        @click="editBooking(booking)"
-                        class="text-blue-600 hover:text-blue-900"
-                      >
+                      <button @click="editBooking(booking)" class="text-blue-600 hover:text-blue-900">
                         Edit
                       </button>
                     </div>
@@ -112,11 +108,11 @@
               </tbody>
             </table>
           </div>
-          
+
           <div v-if="loading" class="text-center py-8">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
-          
+
           <div v-if="bookings.length === 0 && !loading" class="text-center py-8 text-gray-500">
             No bookings found
           </div>
@@ -128,49 +124,43 @@
         <div class="bg-white shadow rounded-lg">
           <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
             <h2 class="text-lg font-medium text-gray-900">All Rooms</h2>
-            <button
-              @click="showCreateRoomModal = true"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-            >
+            <button @click="showCreateRoomModal = true"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
               + Create Room
             </button>
           </div>
-          
+
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-            <div v-for="room in rooms" :key="room.id" 
-                 class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <div v-for="room in rooms" :key="room.id"
+              class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <h3 class="font-semibold text-lg mb-2">{{ room.room_type || 'Room' }}</h3>
               <p class="text-gray-600 mb-2">Room {{ room.number }}</p>
               <p class="text-gray-600 mb-2">Capacity: {{ room.capacity }} guests</p>
               <p class="text-green-600 font-semibold mb-3">${{ room.price_dollar }}/night</p>
-              
+
               <div v-if="room.amenities && room.amenities.length > 0" class="mb-4">
                 <p class="text-sm text-gray-500 mb-1">Amenities:</p>
                 <div class="flex flex-wrap gap-1">
                   <span v-for="amenity in room.amenities" :key="amenity.id"
-                        class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                    class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                     {{ amenity.name }}
                   </span>
                 </div>
               </div>
 
               <div class="flex space-x-2 mt-4">
-                <button
-                  @click="editRoom(room)"
-                  class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors"
-                >
+                <button @click="editRoom(room)"
+                  class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors">
                   Edit
                 </button>
-                <button
-                  @click="confirmDeleteRoom(room)"
-                  class="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors"
-                >
+                <button @click="confirmDeleteRoom(room)"
+                  class="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors">
                   Delete
                 </button>
               </div>
             </div>
           </div>
-          
+
           <div v-if="rooms.length === 0 && !loading" class="text-center py-8 text-gray-500">
             No rooms found
           </div>
@@ -180,36 +170,24 @@
 
     <!-- Create Room Modal -->
     <div v-if="showCreateRoomModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <RoomForm 
-        @close="showCreateRoomModal = false"
-        @success="handleRoomCreated"
-      />
+      <RoomForm @close="showCreateRoomModal = false" @success="handleRoomCreated" />
     </div>
 
     <!-- Edit Room Modal -->
     <div v-if="showEditRoomModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <RoomForm 
-        :room="selectedRoom || undefined"
-        @close="showEditRoomModal = false"
-        @success="handleRoomUpdated"
-      />
+      <RoomForm :room="selectedRoom || undefined" @close="showEditRoomModal = false" @success="handleRoomUpdated" />
     </div>
 
     <!-- Create Booking Modal -->
-    <div v-if="showCreateBookingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <StaffBookingForm 
-        @close="showCreateBookingModal = false"
-        @success="handleBookingCreated"
-      />
+    <div v-if="showCreateBookingModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <StaffBookingForm @close="showCreateBookingModal = false" @success="handleBookingCreated" />
     </div>
 
     <!-- Edit Booking Modal -->
     <div v-if="showEditBookingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <StaffBookingForm 
-        :booking="selectedBooking || undefined"
-        @close="showEditBookingModal = false"
-        @success="handleBookingUpdated"
-      />
+      <StaffBookingForm :booking="selectedBooking || undefined" @close="showEditBookingModal = false"
+        @success="handleBookingUpdated" />
     </div>
 
     <!-- Delete Confirmation Modal -->
@@ -218,16 +196,12 @@
         <h3 class="text-lg font-medium text-gray-900 mb-4">Confirm Delete</h3>
         <p class="text-gray-600 mb-6">{{ deleteConfirmMessage }}</p>
         <div class="flex justify-end space-x-3">
-          <button
-            @click="showDeleteModal = false"
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
-          >
+          <button @click="showDeleteModal = false"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">
             Cancel
           </button>
-          <button
-            @click="handleDelete"
-            class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700"
-          >
+          <button @click="handleDelete"
+            class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700">
             Delete
           </button>
         </div>
@@ -364,7 +338,11 @@ const handleDelete = async () => {
 }
 
 const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString()
+  return new Date(dateString).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
 }
 
 const getStatusColor = (status: string) => {
