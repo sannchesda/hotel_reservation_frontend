@@ -69,6 +69,7 @@ export async function updateBooking(id: number, payload: {
   check_in?: string;
   check_out?: string;
   room_id?: number;
+  user_type: string;
 }) {
   return (await api.put(`/bookings/${id}/`, payload)).data;
 }

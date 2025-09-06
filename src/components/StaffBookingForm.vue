@@ -173,6 +173,7 @@
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { createBooking, updateBooking, getRooms } from '@/services/api'
 import type { Booking, Room, BookingStatus, CreateBookingPayload, UpdateBookingPayload } from '@/types'
+import { useAuthStore } from '@/stores/auth';
 
 interface Props {
   booking?: Booking
@@ -300,6 +301,7 @@ const handleSubmit = async () => {
 
   submitting.value = true
 
+  const authStore = useAuthStore();
   try {
     if (isEditing.value && props.booking) {
       // Update existing booking
@@ -307,7 +309,13 @@ const handleSubmit = async () => {
         status: form.status,
         check_in: form.check_in,
         check_out: form.check_out,
-        room_id: Number(form.room_id)
+        room_id: Number(form.room_id),
+        guest: {
+          full_name: form.guest.full_name.trim(),
+          email: form.guest.email.trim(),
+          phone: form.guest.phone.trim()
+        },
+        user_type: authStore.user?.type || 'guest',
       }
 
       const updatedBooking = await updateBooking(props.booking.id, updatePayload)

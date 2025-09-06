@@ -72,6 +72,12 @@ export interface UpdateBookingPayload {
   check_in?: string;
   check_out?: string;
   room_id?: number;
+  guest?: {
+    full_name: string;
+    email: string;
+    phone: string;
+  };
+  user_type: string;
 }
 
 export interface SearchRoomsParams {

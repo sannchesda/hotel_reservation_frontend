@@ -34,18 +34,13 @@
                                 <span class="font-medium text-gray-900">{{ authStore.user?.name }}</span>
                                 <span class="text-xs text-gray-500 ml-1">({{ authStore.user?.type }})</span>
                             </div>
-                            <button
-                                @click="handleLogout"
-                                class="text-gray-600 hover:text-gray-900 text-sm font-medium"
-                            >
+                            <button @click="handleLogout" class="text-gray-600 hover:text-gray-900 text-sm font-medium">
                                 Logout
                             </button>
                         </div>
                         <div v-else>
-                            <router-link
-                                to="/login"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                            >
+                            <router-link to="/login"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
                                 Login
                             </router-link>
                         </div>
