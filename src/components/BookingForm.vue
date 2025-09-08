@@ -36,16 +36,16 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-              <input v-model="guestInfo.full_name" type="text" :readonly="authStore.isLoggedIn" required :class="[
+              <input v-model="guestInfo.full_name" type="text" :readonly="authStore.isLoggedIn && !authStore.isStaff" required :class="[
                 'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-                authStore.isLoggedIn ? 'bg-gray-100' : ''
+                (authStore.isLoggedIn && !authStore.isStaff) ? 'bg-gray-100' : ''
               ]" placeholder="Enter your full name" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-              <input v-model="guestInfo.email" type="email" required :readonly="authStore.isLoggedIn" :class="[
+              <input v-model="guestInfo.email" type="email" required :readonly="authStore.isLoggedIn && !authStore.isStaff" :class="[
                 'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-                authStore.isLoggedIn ? 'bg-gray-100' : ''
+                (authStore.isLoggedIn && !authStore.isStaff) ? 'bg-gray-100' : ''
               ]" placeholder="Enter your email" />
             </div>
           </div>
